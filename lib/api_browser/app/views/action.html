@@ -81,9 +81,20 @@
     </div>
   </div>
 
-  <div class="row" ng-if="hasResponses()">
+  <div class="row">
     <div class="col-lg-12">
-      <button>Try it out</button>
+      <h2>Try it out</h2>
+      <button type="button" class="btn btn-primary" ng-click="sendRequest()">Send request</button>
+      <div ng-if="response">
+        <h3>Request URL</h3>
+        <pre>{{ requestUrl }}</pre>
+        <h3>Response Status</h3>
+        <pre>{{ response.status }}</pre>
+        <h3>Response Body</h3>
+        <pre>{{ response.body | json }}</pre>
+        <h3>Response Headers</h3>
+        <pre>{{ response.headers | json }}</pre>
+      </div>
     </div>
   </div>
 </div>
