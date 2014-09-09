@@ -4,7 +4,10 @@
   <div class="col-sm-2">
     <rs-type-label type="attribute.type"></rs-type-label>
   </div>
-  <div class="col-sm-7">
+  <div ng-class="{'col-sm-4': allowInput, 'col-sm-7': !allowInput}">
     <rs-attribute-description attribute="attribute"></rs-attribute-description>
+  </div>
+  <div class="col-sm-3" ng-if="allowInput">
+    <input type="text" />
   </div>
 </div>

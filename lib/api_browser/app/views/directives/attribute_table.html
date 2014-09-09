@@ -6,8 +6,11 @@
     <div class="col-sm-2">
       Type
     </div>
-    <div class="col-sm-7">
+    <div ng-class="{'col-sm-4': allowInput, 'col-sm-7': !allowInput}">
       Description
+    </div>
+    <div class="col-sm-3" ng-if="allowInput">
+      Value
     </div>
   </div>
   <div class="content">
@@ -17,7 +20,7 @@
           <strong>{{g.name}}</strong>
         </div>
       </div>
-      <rs-attribute-table-row ng-repeat="item in g.attributes" name="item.name" attribute="item"></rs-attribute-table-row>
+      <rs-attribute-table-row ng-repeat="item in g.attributes" name="item.name" attribute="item" allow-input="allowInput"></rs-attribute-table-row>
     </div>
   </div>
 </div>
