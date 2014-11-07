@@ -10,7 +10,7 @@
         {{ action.name }}
       </h1>
       <p ng-repeat="url in action.urls">
-        {{ url.verb }} {{ url.path }}
+        {{ url.verb }} {{ url.path.string }}
       </p>
       <p>{{ action.description }}</p>
     </div>
@@ -78,6 +78,13 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12">
+      <h2>Try it</h2>
+      <rs-try-it-table action="action"></rs-try-it-table>
     </div>
   </div>
 </div>

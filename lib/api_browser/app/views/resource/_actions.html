@@ -14,7 +14,7 @@
       </div>
       <div class="col-sm-9">
         <div ng-repeat="url in action.urls">
-          {{ url.verb }} {{ url.path }}
+          {{ url.verb }} {{ url.path.string }}
         </div>
         {{ action.description }}
       </div>

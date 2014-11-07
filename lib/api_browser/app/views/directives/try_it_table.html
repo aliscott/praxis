@@ -1,0 +1,71 @@
+<div class="try-it-table attribute-table">
+  <div class="row head" ng-show="action.headers || action.params || action.payload">
+    <div class="col-sm-3">
+      Attribute
+    </div>
+    <div class="col-sm-9">
+      Value
+    </div>
+  </div>
+  <div class="content">
+    <div ng-show="action.headers">
+      <div class="row">
+        <div class="col-sm-12">
+          <strong>Headers</strong>
+        </div>
+      </div>
+      <div class="row" ng-repeat="header in action.headers.type.attributes">
+        <div class="col-sm-3" ng-bind-html="header.name">
+        </div>
+        <div class="col-sm-9">
+          <input type="text" ng-model="header.value" />
+        </div>
+      </div>
+    </div>
+
+    <div ng-show="action.params">
+      <div class="row">
+        <div class="col-sm-12">
+          <strong>Parameters</strong>
+        </div>
+      </div>
+      <div class="row" ng-repeat="param in action.params.type.attributes">
+        <div class="col-sm-3" ng-bind-html="param.name">
+        </div>
+        <div class="col-sm-9">
+          <rs-attribute-input attribute="param"></rs-attribute-input>
+        </div>
+      </div>
+    </div>
+
+    <div ng-show="action.payload">
+      <div class="row">
+        <div class="col-sm-12">
+          <strong>Payload</strong>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <textarea class="payload-raw" elastic ng-model="action.payload.value"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button type="button" class="btn btn-primary" ng-click="sendRequest()">Send request</button>
+
+<div class="row" ng-show="response">
+  <div class="col-lg-12">
+    <div ng-if="response">
+      <h3>Request URL</h3>
+      <pre>{{ requestUrl }}</pre>
+      <h3>Response Status</h3>
+      <pre>{{ response.status }}</pre>
+      <h3>Response Body</h3>
+      <pre>{{ response.body | json }}</pre>
+      <h3>Response Headers</h3>
+      <pre>{{ response.headers | json }}</pre>
+    </div>
+  </div>
+</div>
