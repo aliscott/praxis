@@ -7,6 +7,18 @@ describe Praxis::MediaTypeCollection do
 
   let(:snapshots) { example.snapshots }
 
+  subject(:media_type_collection) do
+    Class.new(Praxis::MediaTypeCollection) do
+      member_type Volume
+    end
+  end
+   
+  context '.member_type' do
+    its(:member_type){ should be(Volume) }
+    its(:member_attribute){ should be_kind_of(Attributor::Attribute) }
+    its('member_attribute.type'){ should be(Volume) }
+  end
+  
   context '.load' do
     let(:volume_data) do
       {
@@ -66,19 +78,20 @@ describe Praxis::MediaTypeCollection do
 
   context '#render' do
 
-    context 'for views that are not defined on on the collection' do
-      subject(:output) { snapshots.render(:default) }
-
-      it { should eq(snapshots.collect(&:render)) }
-    end
-
-    context 'for defined views' do
+    context 'for standard views' do
       subject(:output) { snapshots.render(:link) }
 
       its([:name]) { should eq(snapshots.name)}
       its([:size]) { should eq(snapshots.size)}
       its([:href]) { should eq(snapshots.href)}
     end
+
+    context 'for member views' do
+      subject(:output) { snapshots.render(:default) }
+
+      it { should eq(snapshots.collect(&:render)) }
+    end
+
 
   end
 

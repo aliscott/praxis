@@ -23,6 +23,10 @@ module Praxis
   class MediaTypeCollection < MediaType
     include Enumerable
 
+    class << self
+      attr_accessor :member_attribute
+    end
+    
     def self._finalize!
       super
 
@@ -35,10 +39,11 @@ module Praxis
     end
 
     def self.member_type(type=nil)
-      return @media_type unless type
+      return ( @member_attribute ? @member_attribute.type : nil) unless type
       raise ArgumentError, "invalid type: #{type.name}" unless type < MediaType
 
-      @member_type = type
+      member_options = {}
+      @member_attribute = Attributor::Attribute.new type, member_options
     end
 
     def self.example(context=nil, options: {})
@@ -59,10 +64,10 @@ module Praxis
 
       size.times do |i|
         subcontext = context + ["at(#{i})"]
-        members << @member_type.example(subcontext)
+        members << @member_attribute.example(subcontext)
       end
 
-      
+
       result.object._members = members
       result
     end
@@ -78,9 +83,9 @@ module Praxis
       when Hash
         # Need to parse/deserialize first
         self.new(self.attribute.load(value,context, **options))
-      when Array
+      when Array, Praxis::Mapper::ResourceDecorator
         object = self.attribute.load({})
-        object._members = value.collect { |subvalue| @member_type.load(subvalue) }
+        object._members = value.collect { |subvalue| @member_attribute.load(subvalue) }
         self.new(object)
       else
         # Just wrap whatever value
@@ -88,18 +93,19 @@ module Praxis
       end
     end
 
+    def self.describe(shallow = false)
+      hash = super
+      hash[:member_attribute] = member_attribute.describe(true)
+      hash
+    end
 
-    def render(view_name=:default, context: Attributor::DEFAULT_ROOT_CONTEXT)
-      if (view = self.class.views[view_name])
-        # we have the view ourselves, use it with our atrributes
-        super
-      else
-        # render each member with the view
-        @object.collect.with_index do |member, i| 
-          subcontext = context + ["at(#{i})"]
-          member.render(view_name, context: subcontext)
-        end
+    def self.member_view(name, using: nil)
+      if using
+        member_view = self.member_type.view(using)
+        return self.views[name] = CollectionView.new(name, self, member_view)
       end
+
+      self.views[name]
     end
 
 
@@ -110,8 +116,7 @@ module Praxis
 
     def validate(context=Attributor::DEFAULT_ROOT_CONTEXT)
       errors = super
-
-      @object.each_with_object(errors) do |member, errors|
+      self.each_with_object(errors) do |member, errors|
         errors.push(*member.validate(context))
       end
     end

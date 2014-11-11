@@ -2,7 +2,9 @@ require 'spec_helper'
 
 describe Praxis::Router do
   describe Praxis::Router::VersionMatcher do
-    let(:target){ double("target") }
+    let(:resource_definition){ double("resource_definition", version_options: { using: [:header, :params] }) }
+    let(:action){ double("action", resource_definition: resource_definition ) }
+    let(:target){ double("target", action: action ) }
     let(:args){ {version: "1.0"} }
     subject(:matcher){ Praxis::Router::VersionMatcher.new(target,args) }
 
@@ -72,9 +74,14 @@ describe Praxis::Router do
   end
 
   context ".add_route" do
+    before do
+      expect(router).to receive(:warn).with("other conditions not supported yet")
+    end
+
     let(:route){ double('route', options: [1], version: 1, verb: 'verb', path: 'path')}
     let(:target){ double('target') }
     let(:verb_router){ double('verb_router') }
+
     it 'wraps the target with a VersionMatcher' do
       router.instance_variable_set( :@routes, {'verb'=>verb_router} ) # Ugly, but no need to have a reader
       expect(verb_router).to receive(:on) do|path, args|# .with(route.path, call: "foo")
@@ -86,19 +93,18 @@ describe Praxis::Router do
     end
     
     it "raises warning when options are specified in route" do
-      expect(router).to receive(:warn).with("other conditions not supported yet")
       expect(router.add_route(proc {'target'},route)).to eq(['path'])
     end
   end
 
   context ".call" do
-    let(:env){ {} }
+    let(:env){ {"PATH_INFO"=>"/"} }
     let(:request_version){ nil }
     let(:request) {Praxis::Request.new(env)}
     let(:router_response){ 1 }
     
     before do
-      request.instance_variable_set(:@version,request_version) if request_version
+      env['HTTP_X_API_VERSION'] = request_version if request_version
       allow_any_instance_of(Praxis::Router::RequestRouter).
         to receive(:call).with(request).and_return(router_response)
     end
