@@ -67,6 +67,9 @@ class RestfulDocGenerator
       @controller_config.actions.each do |name, action_config|
         add_to_reachable RestfulDocGenerator.inspect_attributes(action_config.params)
         add_to_reachable RestfulDocGenerator.inspect_attributes(action_config.payload)
+        action_config.responses.each do |_, response_definition|
+          add_to_reachable RestfulDocGenerator.inspect_attributes(response_definition.media_type)
+        end
       end
 
     end
@@ -219,7 +222,7 @@ class RestfulDocGenerator
       # Discard any mediatypes that we've already seen and processed as controller related
       reportable_types = types - media_types_seen_from_controllers - EXCLUDED_TYPES_FROM_TOP_LEVEL
       #TODO: think about these special cases, is it needed?
-      reportable_types.reject!{|type| type < Praxis::Links || type < Praxis::MediaTypeCollection } 
+      reportable_types.reject!{|type| type < Praxis::Links || type < Praxis::MediaTypeCollection }
 
       reportable_types.each do |type|
         index[version] ||= Hash.new
